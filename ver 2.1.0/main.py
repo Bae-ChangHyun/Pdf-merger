@@ -15,7 +15,7 @@
 import os
 import sys
 import fitz
-import info_2
+import info
 from PyQt5.QtWidgets import QFileDialog, QMessageBox,QLabel, QHBoxLayout, QWidget, QVBoxLayout,QScrollArea,QAction,QPushButton,QDialog
 from PyQt5.QtGui import QPixmap,QFont,QImage,QIcon
 from PyQt5.QtCore import Qt
@@ -34,10 +34,10 @@ class PDFMerger(QtWidgets.QMainWindow):
         self.pdf_files=[]
         self.image_label = HoverLabel(None, self)
         
-        self.setWindowTitle('PDF Merger(23.10.24)')
+        self.setWindowTitle("PDF Merger(Ver 2.1.0)")
         self.setGeometry(150, 150, 600, 400)
         
-        icon = QIcon(resource_path('pdf_filetype_icon_177525.ico'))
+        icon = QIcon(resource_path('img/pdf_icon.ico'))
         self.setWindowIcon(icon)
     
         self.setup_ui()
@@ -80,7 +80,7 @@ class PDFMerger(QtWidgets.QMainWindow):
         # "Info" 메뉴
         Info_menu = menubar.addMenu("Info")
         run_info_action = QAction("Run Info", self)
-        run_info_action.triggered.connect(lambda: info_2.DeveloperInfo().exec_())  # info.py의 함수 실행
+        run_info_action.triggered.connect(lambda: info.DeveloperInfo().exec_())  # info.py의 함수 실행
         Info_menu.addAction(run_info_action)
         
         
@@ -247,7 +247,6 @@ class PDFMerger(QtWidgets.QMainWindow):
     def open_pdf_file(self, pdf_file):
         os.startfile(pdf_file)  # Windows에서 파일 열기
     
-        
 class HoverLabel(QLabel):
     def __init__(self, parent=None, main_window=None):
         super().__init__(parent)

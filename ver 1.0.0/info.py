@@ -10,9 +10,7 @@ from tkinter import messagebox
 class developer_info:
     def __init__(self,root):
 
-        #self.root = tk.Tk()
         self.root = tk.Toplevel(root)
-        #self.root.mainloop()
         self.root.title("개발자 정보")
         root_x = self.root.winfo_rootx()
         root_y = self.root.winfo_rooty()
@@ -31,11 +29,11 @@ class developer_info:
         if (text == 'To Mail'):
             webbrowser.open('mailto:matthew624@naver.com', new=1)
         if (text == 'Github_Link'):
-            webbrowser.open('https://github.com/Bae-ChangHyun/home', new=1)
+            webbrowser.open('https://github.com/Bae-ChangHyun', new=1)
         if (text == 'Insta'):
             webbrowser.open('https://www.instagram.com/raeps_dlog_/', new=1)
         if (text == "배창현"):
-            messagebox.showinfo("VER 1.0", "Last Update 22.08.25")
+            messagebox.showinfo("VER 1.0.0", "Last Update 22.08.25")
 
     def click_item(self, event):
         selectedItem = self.treeview.focus()
@@ -64,5 +62,5 @@ class developer_info:
         self.treeview.bind('<ButtonRelease-1>', self.click_item)
 
         self.getValue = "선택후 클릭"
-        self.showed = Button(self.developer_frame, text="VER 1.0", command=partial(self.operate, self.getValue))
+        self.showed = Button(self.developer_frame, text="VER 1.0.0", command=partial(self.operate, self.getValue))
         self.showed.pack(side=BOTTOM, padx=10, pady=10)

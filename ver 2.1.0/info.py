@@ -34,7 +34,7 @@ class DeveloperInfo(QDialog):
         layout = QVBoxLayout(self)
         buttons_info = [
             ("배창현", self.show_personal_info),
-            ("Github", self.open_github, 'https://github.com/Bae-ChangHyun/home'),
+            ("Github", self.open_github, 'https://github.com/Bae-ChangHyun'),
             ("Instagram", self.open_instagram, 'https://www.instagram.com/raeps_dlog_/'),
             ("E-mail", self.open_email_client, 'mailto:matthew624@naver.com'),
             ("License", self.open_VER),
@@ -46,7 +46,7 @@ class DeveloperInfo(QDialog):
             layout.addWidget(button)
 
     def open_github(self):
-        QDesktopServices.openUrl(QUrl('https://github.com/Bae-ChangHyun/home'))
+        QDesktopServices.openUrl(QUrl('https://github.com/Bae-ChangHyun'))
 
     def open_VER(self):
         path=resource_path("License.txt")
@@ -61,10 +61,6 @@ class DeveloperInfo(QDialog):
     def open_email_client(self):
         QDesktopServices.openUrl(QUrl('mailto:matthew624@naver.com'))
 
-    def call_phone(self):
-        phone_number='010-4691-4204'
-        QDesktopServices.openUrl(QUrl("tel:{}".format(phone_number)))
-
     def show_personal_info(self):
         personal_info = QDialog(self)
         personal_info.setGeometry(100, 100, 150, 150)
@@ -74,7 +70,6 @@ class DeveloperInfo(QDialog):
 
         info_items = [
             "나이: 25",
-            ("Phone", self.call_phone),
             ("University", self.open_university, "http://www.sejong.ac.kr/")
         ]
 

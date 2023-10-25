@@ -1,17 +1,16 @@
 import os
 import sys
-from PyQt5.QtWidgets import QFileDialog, QMessageBox
+import fitz
+import info
+from PyQt5.QtWidgets import QFileDialog, QMessageBox, QLabel, QHBoxLayout, QWidget
 from PyQt5.QtGui import QFont
-from PyQt5.QtWidgets import QLabel, QHBoxLayout, QWidget
 from PyQt5 import QtCore, QtGui, QtWidgets, sip
-from PyPDF4 import PdfFileReader
-from PyPDF4 import PdfFileMerger
-import test
+from PyPDF4 import PdfFileReader,PdfFileMerger
 
 class PDFMerger(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("PDF Merger(Ver 1.1)")
+        self.setWindowTitle("PDF Merger(Ver 2.0.0)")
         self.setGeometry(200, 200, 600, 500)
 
         self.pdf_files = []
@@ -26,7 +25,7 @@ class PDFMerger(QtWidgets.QMainWindow):
         menu = self.menuBar()
         developer_menu = menu.addMenu('Developer')
         developer_info = QtWidgets.QAction('Developer Information', self)
-        developer_info.triggered.connect(lambda: test.DeveloperInfo().exec())
+        developer_info.triggered.connect(lambda: info.DeveloperInfo().exec())
         developer_menu.addAction(developer_info)
 
     def create_widgets(self):
@@ -95,7 +94,6 @@ class PDFMerger(QtWidgets.QMainWindow):
         main_layout.addWidget(self.merge_button, alignment=QtCore.Qt.AlignCenter | QtCore.Qt.AlignBottom)
 
     def restart(self):
-        #self.canvas.setParent(None)
         sip.delete(self.canvas)
         self.create_widgets()
         return
@@ -114,9 +112,7 @@ class PDFMerger(QtWidgets.QMainWindow):
 
     def move_up(self, index):
         if index > 0:
-            # Move the item at the current index up by one
             self.pdf_files.insert(index - 1, self.pdf_files.pop(index))
-            # Update the UI to reflect the new order
             self.restart()
             self.show_pdf_files()
         else:
@@ -124,9 +120,7 @@ class PDFMerger(QtWidgets.QMainWindow):
 
     def move_down(self, index):
         if index < len(self.pdf_files) - 1:
-            # Move the item at the current index down by one
             self.pdf_files.insert(index + 1, self.pdf_files.pop(index))
-            # Update the UI to reflect the new order
             self.restart()
             self.show_pdf_files()
         else:
@@ -181,24 +175,20 @@ class PDFMerger(QtWidgets.QMainWindow):
         self.scroll_area.setFrameShape(QtWidgets.QFrame.NoFrame)
         layout.addWidget(self.scroll_area)
         self.setCentralWidget(self.canvas)
-        import fitz
+        
 
         for i, pdf_file in enumerate(self.pdf_files):
-            # Create a widget to hold both the image and the text
             open_pdf = fitz.open(pdf_file)
             pix = open_pdf[0].get_pixmap()
             pix1 = fitz.Pixmap(pix, 0) if pix.alpha else pix
             qimg = QtGui.QImage(pix1.samples, pix1.width, pix1.height, pix1.stride, QtGui.QImage.Format_RGB888)
-            # Convert the QImage to a QPixmap
             pixmap = QtGui.QPixmap(qimg).scaled(80,48)
             self.pdf_images.append(pixmap)
 
-            # Create a widget to hold both the image and the text
             widget = QWidget(self.canvas)
             hbox = QHBoxLayout(widget)
             hbox.setAlignment(QtCore.Qt.AlignLeft | QtCore.Qt.AlignVCenter)
 
-            # Add the image to the layout
             image_label = QLabel(widget)
             image_label.setPixmap(pixmap)
             hbox.addWidget(image_label)
@@ -206,11 +196,9 @@ class PDFMerger(QtWidgets.QMainWindow):
             pdf_reader = PdfFileReader(pdf_file)
             num_pages = pdf_reader.getNumPages()
 
-            # Add the text to the layout
             label = QLabel(widget)
             label.setFont(QFont("Arial", 10))
             #label.setWordWrap(True) --> 글이 길어지면 줄바꿈
-            print(num_pages)
             texts="  ("+os.path.basename(pdf_file)[:5]+"...전체 "+str(num_pages)+"p )"
             label.setText(texts)
             hbox.addWidget(label)
@@ -236,13 +224,11 @@ class PDFMerger(QtWidgets.QMainWindow):
             down_button.clicked.connect(lambda _, idx=i: self.move_down(idx))
             hbox.addWidget(down_button)
 
-            # Set the widget's layout and add to the list of label
             widget.setStyleSheet("padding: 10px 20px;")
 
             self.pdf_labels.append(widget)
             self.canvas.layout().addWidget(widget)
 
-        # Add button to allow users to add more pdf files
         add_button = QtWidgets.QPushButton("Add Files", self.canvas)
         add_button.setFont(QtGui.QFont("Arial", 10))
         add_button.setStyleSheet("background-color: #2196F3; color: white;")
@@ -250,7 +236,6 @@ class PDFMerger(QtWidgets.QMainWindow):
         add_button.setFixedSize(100, 35)
         layout.addWidget(add_button, alignment=QtCore.Qt.AlignCenter)
 
-        # Add button to clear the pdf list
         clear_button = QtWidgets.QPushButton("Clear Files", self.canvas)
         clear_button.setFont(QtGui.QFont("Arial", 10))
         clear_button.setStyleSheet("background-color: #F44336; color: white;")
@@ -259,8 +244,6 @@ class PDFMerger(QtWidgets.QMainWindow):
         layout.addWidget(clear_button, alignment=QtCore.Qt.AlignCenter)
 
         layout.addWidget(self.merge_button, alignment=QtCore.Qt.AlignCenter | QtCore.Qt.AlignBottom)
-
-        # self.scroll_area.setWidget(self.canvas)
 
     def merge_pdfs(self):
         if len(self.pdf_files) < 2:

@@ -1,16 +1,17 @@
 import os
 import sys
 import PyPDF2
+from PyPDF2 import PdfMerger
 import tkinter as tk
 from tkinter import filedialog
 from PIL import Image, ImageTk
 from tkinter import messagebox
-import developer
+import info
 
 class PDFMerger:
     def __init__(self, root):
         self.root = root
-        self.root.title("PDF Merger(Ver 1.0)")
+        self.root.title("PDF Merger(Ver 1.0.0)")
         self.root.geometry("600x500")
 
         self.pdf_files = []
@@ -31,7 +32,7 @@ class PDFMerger:
 
     def create_menu(self):
         self.menu = tk.Menu(self.root)
-        self.menu.add_command(label="개발자 정보", command=lambda: developer.developer_info(self.root))
+        self.menu.add_command(label="개발자 정보", command=lambda: info.developer_info(self.root))
         self.root.config(menu=self.menu)
 
 
@@ -137,9 +138,7 @@ class PDFMerger:
 
     def move_up(self, index):
         if index > 0:
-            # Move the item at the current index up by one
             self.pdf_files.insert(index - 1, self.pdf_files.pop(index))
-            # Update the UI to reflect the new order
             self.restart()
             self.show_pdf_files()
         else:
@@ -147,9 +146,7 @@ class PDFMerger:
 
     def move_down(self, index):
         if index < len(self.pdf_files) - 1:
-            # Move the item at the current index down by one
             self.pdf_files.insert(index + 1, self.pdf_files.pop(index))
-            # Update the UI to reflect the new order
             self.restart()
             self.show_pdf_files()
         else:
@@ -200,7 +197,6 @@ class PDFMerger:
             return os.path.join(base_path, relative_path)
 
         for i, pdf_file in enumerate(self.pdf_files):
-            # Create a label with the filename and icon
             png_path=resource_path("img\pdf_icon.png")
             pdf_image = Image.open(png_path).resize((32, 32), Image.Resampling.LANCZOS)
 
@@ -216,7 +212,6 @@ class PDFMerger:
             label.bind("<Button-1>", lambda event, image_idx=i: self.select_del_pdf(event, image_idx))
             label.pack(side="top", fill="x", padx=10, pady=5)
             self.pdf_labels.append(label)
-        # Add button to allow users to add more pdf files
         add_button = tk.Button(
             self.canvas,
             text="Add Files",
@@ -229,7 +224,6 @@ class PDFMerger:
         )
         add_button.pack(side="bottom", padx=10, pady=5)
 
-        # Add button to clear the pdf list
         clear_button = tk.Button(
             self.canvas,
             text="Clear",
@@ -244,30 +238,26 @@ class PDFMerger:
 
     def merge_pdfs(self):
         if len(self.pdf_files) < 2:
-            QtWidgets.QMessageBox.warning(self, "Warning", "파일을 최소 2개 이상 선택하세요.")
+            messagebox.showwarning("Warning", "파일을 최소 2개 이상 선택하세요.")
             return
 
-        pdf_writer = QtGui.QPdfWriter()
-        pdf_writer.setOutputFileName(
-            QtWidgets.QFileDialog.getSaveFileName(self, "PDF파일 병합하기", ".", "PDF files (*.pdf)")[0])
-        pdf_writer.setPageSize(QtCore.QSizeF(595, 842))  # A4 size
+        output_file = filedialog.asksaveasfilename(
+            defaultextension=".pdf",
+            filetypes=[("PDF files", "*.pdf")],
+            title="Save Merged PDF As",
+        )
 
-        painter = QtGui.QPainter(pdf_writer)
-        font = QtGui.QFont("Arial", 10)
-        painter.setFont(font)
+        if output_file:
+            pdf_merger = PdfMerger()
 
-        for pdf_file in self.pdf_files:
-            pdf_reader = QtGui.QPdfDocument(pdf_file)
-            for i in range(pdf_reader.pageCount()):
-                pdf_reader_page = pdf_reader.page(i)
-                painter.drawImage(0, 0, pdf_reader_page.renderToImage())
-                if i != pdf_reader.pageCount() - 1:
-                    pdf_writer.newPage()
+            for pdf_file in self.pdf_files:
+                pdf_merger.append(pdf_file)
 
-        painter.end()
+            pdf_merger.write(output_file)
+            pdf_merger.close()
 
-        QtWidgets.QMessageBox.information(self, "Success", "PDF 병합이 완료되었습니다.")
-        self.restart()
+            messagebox.showinfo("Success", "PDF 병합이 완료되었습니다.")
+            self.restart()
 
     def resize_canvas(self, event):
         self.canvas.configure(scrollregion=self.canvas.bbox("all"))
